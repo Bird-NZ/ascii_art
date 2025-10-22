@@ -1,0 +1,19 @@
+name: spec-sync-and-validate
+on:
+  pull_request:
+
+jobs:
+  spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pull the canonical SPEC.md from framework-spec (pin to a tag for stability if you want)
+      - name: Sync SPEC.md from framework-spec
+        run: |
+          mkdir -p spec
+          curl -sSLo spec/SPEC.md https://raw.githubusercontent.com/Bird-NZ/framework-spec/main/spec/SPEC.md
+
+      # Call the reusable validator in framework-spec
+      - name: Validate stack conformance
+        uses: Bird-NZ/framework-spec/.github/workflows/validate-stack.yml@main

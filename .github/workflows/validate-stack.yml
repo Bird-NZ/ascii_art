@@ -1,0 +1,39 @@
+name: validate-stack
+on:
+  workflow_call: {}   # allows other repos to call this workflow
+
+jobs:
+  guardrails:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1) Require SPEC file
+      - name: Check SPEC presence
+        run: |
+          test -f spec/SPEC.md || (echo "ERROR: spec/SPEC.md missing" && exit 1)
+
+      # 2) Verify frontend (Next.js + Tailwind)
+      - name: Verify Frontend (Next.js + Tailwind)
+        run: |
+          test -f apps/frontend/package.json || (echo "ERROR: apps/frontend/package.json missing" && exit 1)
+          grep -q "\"next\":" apps/frontend/package.json || (echo "ERROR: Next.js not found in package.json" && exit 1)
+          grep -qi "tailwind" apps/frontend/package.json || (echo "ERROR: Tailwind not found in package.json" && exit 1)
+
+      # 3) Verify backend (FastAPI)
+      - name: Verify Backend (FastAPI)
+        run: |
+          test -f apps/api/pyproject.toml || test -f apps/api/requirements.txt || (echo "ERROR: No Python dependency file found in apps/api" && exit 1)
+          (grep -qi "fastapi" apps/api/pyproject.toml 2>/dev/null || grep -qi "fastapi" apps/api/requirements.txt 2>/dev/null) || (echo "ERROR: fastapi dependency not found" && exit 1)
+
+      # 4) Verify Azure IaC present
+      - name: Verify Azure Infrastructure as Code (Bicep)
+        run: |
+          test -d infra/bicep || test -f infra/main.bicep || (echo "ERROR: Azure Bicep IaC not found (expect infra/bicep/ or infra/main.bicep)" && exit 1)
+
+      # 5) Optional: warn if shadcn/ui components not scaffolded yet (non-blocking)
+      - name: Warn if shadcn/ui not detected
+        run: |
+          if ! grep -Rqi "shadcn" apps/frontend 2>/dev/null; then
+            echo "WARN: shadcn/ui components not detected yet (ok if early in project)."
+          fi
