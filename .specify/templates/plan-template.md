@@ -31,7 +31,13 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Architecture MUST use Next.js + Tailwind/shadcn/ui in `apps/frontend` and FastAPI in `apps/api` deployed via Azure Static Web Apps and Azure App Service/Container Apps.
+- Plan MUST codify infrastructure in `infra/bicep`, provisioning Azure PostgreSQL, Redis, Service Bus, Blob Storage, Application Insights, and Entra ID integration.
+- ASCII transformation workflow MUST describe deterministic processing via Blob Storage ingestion, Service Bus triggered FastAPI workers, and normalized ASCII outputs with configuration controls.
+- Observability strategy MUST commit to OpenTelemetry traces, metrics, and structured logs flowing to Application Insights with correlation IDs per conversion job.
+- Quality gates MUST include CI execution of pytest, Vitest, Playwright, and static analysis (ruff, black, mypy, eslint, prettier).
+- Security posture MUST cover Entra ID authentication, Key Vault secrets management, upload validation/scanning, and retention rules for source images.
+- Performance targets MUST address scaling for >= 50 parallel conversions with <= 5 s p95 latency for images up to 5 MB.
 
 ## Project Structure
 

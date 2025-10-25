@@ -5,6 +5,8 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+> Constitution alignment reminder: Every feature specification MUST preserve the Azure stack (Next.js/Tailwind/shadcn/ui frontend, FastAPI backend, Bicep infrastructure) and uphold deterministic ASCII conversion, observability, accessibility, and security rules.
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
@@ -84,16 +86,16 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-001**: Solution MUST route uploads through Azure Blob Storage and queue processing with Azure Service Bus.
+- **FR-002**: FastAPI workers MUST convert images to ASCII deterministically and persist normalized outputs.
+- **FR-003**: Next.js frontend MUST present accessible previews using Tailwind/shadcn/ui components with WCAG AA contrast options.
+- **FR-004**: Observability MUST emit OpenTelemetry traces and metrics to Azure Application Insights for each conversion job.
+- **FR-005**: Authentication MUST leverage Microsoft Entra ID, with secrets sourced exclusively from Azure Key Vault.
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-006**: ASCII conversion MUST meet [NEEDS CLARIFICATION: specify target latency or throughput].
+- **FR-007**: Source image retention MUST follow [NEEDS CLARIFICATION: retention policy or purge conditions].
 
 ### Key Entities *(include if feature involves data)*
 

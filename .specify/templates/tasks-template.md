@@ -12,6 +12,8 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+> Constitution alignment reminder: Task decomposition MUST preserve the Azure stack, deterministic ASCII workflow, observability signals, accessibility commitments, and security controls defined in the constitution.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
@@ -48,9 +50,10 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] T001 Scaffold `apps/frontend` Next.js project with Tailwind and shadcn/ui baseline
+- [ ] T002 Scaffold `apps/api` FastAPI service with ASCII pipeline skeleton and Service Bus integrations
+- [ ] T003 [P] Initialize `infra/bicep` modules for Blob Storage, PostgreSQL, Redis, Service Bus, Application Insights, and Entra ID
+- [ ] T004 [P] Configure linting/formatting (ruff, black, mypy, eslint, prettier) and GitHub Actions workflow stubs
 
 ---
 
@@ -62,12 +65,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T005 Establish PostgreSQL schema and Alembic migrations for job tracking and preferences
+- [ ] T006 [P] Implement Entra ID auth flow and Key Vault secret bindings in FastAPI
+- [ ] T007 [P] Configure Azure Blob Storage upload lifecycle and content scanning hooks
+- [ ] T008 Implement base FastAPI routing, ASCII conversion service contracts, and Service Bus message schema
+- [ ] T009 Configure OpenTelemetry exporters for API, workers, and frontend instrumentation
+- [ ] T010 Define environment configuration management with Azure App Configuration or env files for local dev
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,17 +86,16 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T011 [P] [US1] Contract test for ASCII conversion API in `tests/contract/test_ascii_conversion.py`
+- [ ] T012 [P] [US1] Playwright flow verifying accessible upload and preview journey
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T013 [P] [US1] Create ASCII job model in `apps/api/app/models/job.py`
+- [ ] T014 [P] [US1] Implement grayscale-to-ASCII service in `apps/api/app/services/renderer.py`
+- [ ] T015 [US1] Expose conversion endpoint in `apps/api/app/api/routes/ascii.py`
+- [ ] T016 [US1] Build upload + preview UI in `apps/frontend/app/(app)/ascii/page.tsx`
+- [ ] T017 [US1] Add validation, error handling, and telemetry correlation across API and frontend
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -107,15 +109,15 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T018 [P] [US2] Contract test for customization settings API in `tests/contract/test_ascii_settings.py`
+- [ ] T019 [P] [US2] Integration test covering queued conversions and WebSocket/SignalR updates
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T020 [P] [US2] Extend job preferences model with character set and contrast options
+- [ ] T021 [US2] Implement customization service in `apps/api/app/services/customization.py`
+- [ ] T022 [US2] Surface configuration UI in `apps/frontend/components/ascii/controls.tsx`
+- [ ] T023 [US2] Integrate Service Bus message updates to reflect customization choices
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -129,14 +131,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T024 [P] [US3] Contract test for sharing/export endpoint in `tests/contract/test_ascii_export.py`
+- [ ] T025 [P] [US3] Integration test for CDN-delivered assets and caching rules
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T026 [P] [US3] Add export metadata model in PostgreSQL
+- [ ] T027 [US3] Implement export service writing assets to Blob Storage with CDN headers
+- [ ] T028 [US3] Add sharing endpoints/UI and ensure accessibility checks remain green
 
 **Checkpoint**: All user stories should now be independently functional
 
