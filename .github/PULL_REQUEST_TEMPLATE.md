@@ -4,7 +4,7 @@
 ### Checks
 - [ ] Uses Next.js + Tailwind/shadcn/ui (frontend)
 - [ ] Uses FastAPI (backend)
-- [ ] Azure IaC present (Bicep)
+- [ ] Provider-agnostic IaC present (Terraform/Pulumi/Compose)
 - [ ] Folder structure matches the spec
 - [ ] Tests updated (pytest / Vitest or Jest / Playwright)
-- [ ] No non-Azure cloud services introduced
+- [ ] No new cloud lock-in introduced without approved fallback

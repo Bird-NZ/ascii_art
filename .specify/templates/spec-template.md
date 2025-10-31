@@ -5,7 +5,7 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
-> Constitution alignment reminder: Every feature specification MUST preserve the Azure stack (Next.js/Tailwind/shadcn/ui frontend, FastAPI backend, Bicep infrastructure) and uphold deterministic ASCII conversion, observability, accessibility, and security rules.
+> Constitution alignment reminder: Every feature specification MUST preserve the portable stack (Next.js/Tailwind/shadcn/ui frontend, FastAPI backend, provider-agnostic infrastructure) and uphold deterministic ASCII conversion, observability, accessibility, and security rules.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -86,11 +86,11 @@
 
 ### Functional Requirements
 
-- **FR-001**: Solution MUST route uploads through Azure Blob Storage and queue processing with Azure Service Bus.
+- **FR-001**: Solution MUST route uploads through object storage (e.g., MinIO, S3) and queue processing with a vendor-neutral message bus (e.g., Redis Streams, RabbitMQ, Celery queues).
 - **FR-002**: FastAPI workers MUST convert images to ASCII deterministically and persist normalized outputs.
 - **FR-003**: Next.js frontend MUST present accessible previews using Tailwind/shadcn/ui components with WCAG AA contrast options.
-- **FR-004**: Observability MUST emit OpenTelemetry traces and metrics to Azure Application Insights for each conversion job.
-- **FR-005**: Authentication MUST leverage Microsoft Entra ID, with secrets sourced exclusively from Azure Key Vault.
+- **FR-004**: Observability MUST emit OpenTelemetry traces and metrics via OTLP to the configured observability stack for each conversion job.
+- **FR-005**: Authentication MUST leverage a standards-based OIDC provider, with secrets sourced exclusively from a managed secret store (e.g., Vault, AWS Secrets Manager, Doppler).
 
 *Example of marking unclear requirements:*
 

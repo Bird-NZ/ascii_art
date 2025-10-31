@@ -26,10 +26,19 @@ jobs:
           test -f apps/api/pyproject.toml || test -f apps/api/requirements.txt || (echo "ERROR: No Python dependency file found in apps/api" && exit 1)
           (grep -qi "fastapi" apps/api/pyproject.toml 2>/dev/null || grep -qi "fastapi" apps/api/requirements.txt 2>/dev/null) || (echo "ERROR: fastapi dependency not found" && exit 1)
 
-      # 4) Verify Azure IaC present
-      - name: Verify Azure Infrastructure as Code (Bicep)
+      # 4) Verify provider-agnostic IaC present and no Azure-only templates
+      - name: Verify Infrastructure as Code (Portable)
         run: |
-          test -d infra/bicep || test -f infra/main.bicep || (echo "ERROR: Azure Bicep IaC not found (expect infra/bicep/ or infra/main.bicep)" && exit 1)
+          if test -d infra/terraform || test -f infra/main.tf || test -f infra/docker-compose.yml || test -d infra/ops || test -f docker-compose.yml; then
+            echo "Found portable infrastructure definitions."
+          else
+            echo "ERROR: Provider-agnostic infrastructure definition not found (expect infra/terraform/, infra/main.tf, infra/docker-compose.yml, infra/ops/, or docker-compose.yml)"
+            exit 1
+          fi
+          if [ -d infra ] && find infra -name "*.bicep" -print -quit 2>/dev/null | grep -q .; then
+            echo "ERROR: Azure Bicep files detected; constitution requires provider-agnostic IaC."
+            exit 1
+          fi
 
       # 5) Optional: warn if shadcn/ui components not scaffolded yet (non-blocking)
       - name: Warn if shadcn/ui not detected

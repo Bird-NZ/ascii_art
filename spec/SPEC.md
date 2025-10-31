@@ -1,29 +1,29 @@
-# SPEC.md — Standard Application Framework (Azure Edition)
+# SPEC.md — Standard Application Framework (Portable Edition)
 
 This specification defines the **standard frameworks, structure, and rules** for all projects that I (and my AI coding agents) build.  
-It ensures every project uses the same reliable, Azure-based stack with consistent structure and style.
+It ensures every project uses the same portable stack with consistent structure and style while avoiding provider lock-in.
 
 ---
 
 ## 1. Purpose
 
-To keep all my projects consistent, modern, and deployable to **Microsoft Azure** — while allowing fast, creative development using Python and JavaScript.
 
+```yaml
 ---
 
 ## 2. Core Framework Stack
 
-| Layer | Framework | Description | Azure Service |
-|-------|------------|--------------|----------------|
-| **Frontend** | **Next.js (React)** | Builds the user interface and handles routing (SSR, SSG, SPA). | **Azure Static Web Apps** or **Azure App Service (Node)** |
-| **Styling** | **Tailwind CSS + shadcn/ui** | Provides a modern, accessible design system. | — |
-| **Backend** | **FastAPI (Python)** | Async REST API for logic and data. | **Azure App Service / Container Apps / AKS** |
-| **Database** | **PostgreSQL** | Stores app data. | **Azure Database for PostgreSQL (Flexible Server)** |
-| **Cache** | **Redis** | Speeds up reads and sessions. | **Azure Cache for Redis** |
-| **Messaging** | **Azure Service Bus** | Handles background tasks and event messaging. | **Service Bus** |
-| **Storage** | **Blob Storage** | Stores images, media, and files. | **Azure Blob Storage + CDN / Front Door** |
-| **Identity** | **Microsoft Entra ID (Azure AD)** | Auth & single sign-on. | **Azure Entra ID** |
-| **Monitoring** | **OpenTelemetry + Application Insights** | Logs, metrics, tracing. | **Azure Monitor / App Insights** |
+| Layer | Framework | Description | Hosting Notes |
+|-------|-----------|-------------|---------------|
+| **Frontend** | **Next.js (React)** | Builds the user interface and handles routing (SSR, SSG, SPA). | Deploy via static hosting or Node runtimes on any platform (Vercel, Netlify, Cloudflare, Kubernetes, custom VM). |
+| **Styling** | **Tailwind CSS + shadcn/ui** | Provides an accessible, composable design system. | Works with any CSS pipeline; ship design tokens from `packages/shared`. |
+| **Backend** | **FastAPI (Python)** | Async REST API for logic and data. | Package as OCI image; run on containers, serverless, or managed runtimes. |
+| **Database** | **PostgreSQL** | Stores application data and metadata. | Use managed PostgreSQL or self-hosted container. |
+| **Cache** | **Redis** | Accelerates reads and sessions. | Compatible with Redis OSS, Valkey, Dragonfly, or managed equivalents. |
+| **Messaging** | **Vendor-neutral queue** | Handles background tasks and event messaging. | Recommended: Redis Streams, RabbitMQ, NATS JetStream, or Celery brokers. |
+| **Storage** | **S3-compatible object storage** | Stores images, media, and files. | Use MinIO locally; deploy to S3, DigitalOcean Spaces, Backblaze B2, etc. |
+| **Identity** | **OpenID Connect provider** | Authentication & single sign-on. | Works with Auth0, Okta, Entra ID, Keycloak, Cognito, etc. |
+| **Monitoring** | **OpenTelemetry + OTLP collector** | Logs, metrics, tracing. | Export to Grafana Tempo, Honeycomb, New Relic, Datadog, etc. |
 
 ---
 
@@ -39,7 +39,7 @@ repo/
   packages/
     shared/        # Shared code (types, clients)
   infra/
-    bicep/         # Azure infrastructure templates
+    ops/           # Provider-agnostic infrastructure templates
   spec/
     SPEC.md        # This spec file
 ```
@@ -58,21 +58,21 @@ repo/
   - End-to-End: `Playwright`  
 - **Accessibility:** Must meet **WCAG AA** standards.  
 - **Commits:** Follow [Conventional Commits](https://www.conventionalcommits.org/).  
-- **Secrets:** Never stored locally — always in **Azure Key Vault**.  
-- **Config:** Use `.env` for local dev only.
+- **Containerization:** Provide multi-stage Dockerfiles for frontend and backend.  
+- **Secrets:** Store in a managed secret manager (e.g., HashiCorp Vault, AWS Secrets Manager, Doppler). `.env` files are for local development only.
 
 ---
 
 ## 5. Deployment Standards
 
-- **Infrastructure:** Written in **Azure Bicep**.  
-- **CI/CD:** GitHub Actions or Azure Pipelines.  
+- **Infrastructure:** Defined with provider-agnostic IaC (Terraform, Pulumi, Crossplane, Ansible).  
+- **CI/CD:** GitHub Actions with workflows for linting, testing, container builds, and infrastructure validation.  
 - **Hosting:**  
-  - Frontend → Azure Static Web Apps  
-  - API → Azure App Service / Container Apps  
-- **Data:** Azure PostgreSQL + Redis  
-- **Security:** Azure Entra ID (OIDC).  
-- **Monitoring:** Azure Application Insights + Log Analytics.
+  - Frontend → Static hosting or containerized Node runtime.  
+  - API → Container platform (Kubernetes, ECS, Fly.io, Azure Container Apps, etc.).  
+- **Data:** PostgreSQL + Redis deployed via managed services or self-hosted containers.  
+- **Security:** Standards-based OIDC login; infrastructure policies reviewed for least privilege.  
+- **Monitoring:** OpenTelemetry exporters sending OTLP data to the selected observability backend.
 
 ---
 
@@ -85,12 +85,31 @@ services:
   postgres:
     image: postgres:16
     ports: ["5432:5432"]
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:7
     ports: ["6379:6379"]
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
-    ports: ["10000:10000", "10001:10001"]
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: dev
+      MINIO_ROOT_PASSWORD: devpass123
+    ports: ["9000:9000", "9001:9001"]
+    volumes:
+      - minio-data:/data
+  queue:
+    image: rabbitmq:3-management
+    ports: ["5672:5672", "15672:15672"]
+
+volumes:
+  postgres-data:
+  minio-data:
+```
 ```
 
 ### Local run commands
@@ -105,10 +124,10 @@ services:
 Every repository that follows this spec must:
 
 1. Include this `SPEC.md` (or sync it from the `framework-spec` repo).  
-2. Use **Next.js + Tailwind/shadcn/ui + FastAPI + Azure Bicep**.  
+2. Use **Next.js + Tailwind/shadcn/ui + FastAPI + provider-agnostic IaC**.  
 3. Pass the **validate-stack** workflow before merging pull requests.  
-4. Never include other web frameworks (e.g., Flask, Express, Django).  
-5. Use Azure as the only cloud provider.  
+4. Avoid alternative web frameworks (e.g., Flask, Express, Django) without written approval.  
+5. Document any provider-specific services together with portability fallbacks.
 
 ---
 
@@ -119,7 +138,8 @@ Each project will use this GitHub Action:
 - Runs checks for:
   - `apps/frontend/package.json` includes `"next"` and `"tailwind"`.  
   - `apps/api/pyproject.toml` includes `"fastapi"`.  
-  - `infra/bicep/` folder exists.  
+  - Provider-agnostic infrastructure files exist (`infra/ops`, Terraform, Pulumi, or docker-compose).  
+  - No Azure-only Bicep templates are committed.  
 - Fails the pull request if the project breaks the rules.
 
 ---
@@ -128,7 +148,7 @@ Each project will use this GitHub Action:
 
 Projects should note the spec version they’re built on:
 ```
-spec-version: 1.0.0
+spec-version: 2.0.0
 ```
 When `framework-spec` updates, projects can pull the new version or stay pinned to their current one.
 
@@ -138,15 +158,15 @@ When `framework-spec` updates, projects can pull the new version or stay pinned 
 
 ✅ This `SPEC.md` defines:  
 - The **exact frameworks** (Next.js + Tailwind/shadcn/ui + FastAPI)  
-- The **Azure services** you must use  
+- The **portable infrastructure** expectations  
 - The **folder layout and coding rules**  
-- The **GitHub validation workflow** to enforce it  
+- The **GitHub validation workflow** that enforces portability  
 
-All your coding agents and collaborators should start each project from a template that references this spec.
+All coding agents and collaborators should start each project from a template that references this spec.
 
 ---
 
 **Author:** Mat  
 **Repository:** `framework-spec`  
-**Version:** 1.0.0  
-**Last updated:** 2025-10-17
+**Version:** 2.0.0  
+**Last updated:** 2025-10-31

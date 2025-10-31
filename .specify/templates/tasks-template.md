@@ -12,7 +12,7 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
-> Constitution alignment reminder: Task decomposition MUST preserve the Azure stack, deterministic ASCII workflow, observability signals, accessibility commitments, and security controls defined in the constitution.
+> Constitution alignment reminder: Task decomposition MUST preserve the portable stack, deterministic ASCII workflow, observability signals, accessibility commitments, and security controls defined in the constitution.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -51,8 +51,8 @@ description: "Task list template for feature implementation"
 **Purpose**: Project initialization and basic structure
 
 - [ ] T001 Scaffold `apps/frontend` Next.js project with Tailwind and shadcn/ui baseline
-- [ ] T002 Scaffold `apps/api` FastAPI service with ASCII pipeline skeleton and Service Bus integrations
-- [ ] T003 [P] Initialize `infra/bicep` modules for Blob Storage, PostgreSQL, Redis, Service Bus, Application Insights, and Entra ID
+- [ ] T002 Scaffold `apps/api` FastAPI service with ASCII pipeline skeleton and vendor-neutral messaging integrations
+- [ ] T003 [P] Initialize `infra/ops` modules (Terraform/Pulumi) for object storage, PostgreSQL, Redis, messaging, and observability exporters
 - [ ] T004 [P] Configure linting/formatting (ruff, black, mypy, eslint, prettier) and GitHub Actions workflow stubs
 
 ---
@@ -66,11 +66,11 @@ description: "Task list template for feature implementation"
 Examples of foundational tasks (adjust based on your project):
 
 - [ ] T005 Establish PostgreSQL schema and Alembic migrations for job tracking and preferences
-- [ ] T006 [P] Implement Entra ID auth flow and Key Vault secret bindings in FastAPI
-- [ ] T007 [P] Configure Azure Blob Storage upload lifecycle and content scanning hooks
-- [ ] T008 Implement base FastAPI routing, ASCII conversion service contracts, and Service Bus message schema
+- [ ] T006 [P] Implement OIDC auth flow and secret management bindings in FastAPI
+- [ ] T007 [P] Configure object storage upload lifecycle and content scanning hooks
+- [ ] T008 Implement base FastAPI routing, ASCII conversion service contracts, and message schema for the selected queue
 - [ ] T009 Configure OpenTelemetry exporters for API, workers, and frontend instrumentation
-- [ ] T010 Define environment configuration management with Azure App Configuration or env files for local dev
+- [ ] T010 Define environment configuration management with environment-specific settings and secrets loading strategy
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -110,14 +110,14 @@ Examples of foundational tasks (adjust based on your project):
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
 - [ ] T018 [P] [US2] Contract test for customization settings API in `tests/contract/test_ascii_settings.py`
-- [ ] T019 [P] [US2] Integration test covering queued conversions and WebSocket/SignalR updates
+- [ ] T019 [P] [US2] Integration test covering queued conversions and WebSocket/socket updates
 
 ### Implementation for User Story 2
 
 - [ ] T020 [P] [US2] Extend job preferences model with character set and contrast options
 - [ ] T021 [US2] Implement customization service in `apps/api/app/services/customization.py`
 - [ ] T022 [US2] Surface configuration UI in `apps/frontend/components/ascii/controls.tsx`
-- [ ] T023 [US2] Integrate Service Bus message updates to reflect customization choices
+- [ ] T023 [US2] Integrate message bus updates to reflect customization choices
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -137,7 +137,7 @@ Examples of foundational tasks (adjust based on your project):
 ### Implementation for User Story 3
 
 - [ ] T026 [P] [US3] Add export metadata model in PostgreSQL
-- [ ] T027 [US3] Implement export service writing assets to Blob Storage with CDN headers
+- [ ] T027 [US3] Implement export service writing assets to object storage with CDN headers
 - [ ] T028 [US3] Add sharing endpoints/UI and ensure accessibility checks remain green
 
 **Checkpoint**: All user stories should now be independently functional
